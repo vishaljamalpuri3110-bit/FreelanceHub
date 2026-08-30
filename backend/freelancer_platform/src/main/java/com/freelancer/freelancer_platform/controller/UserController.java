@@ -3,8 +3,11 @@ package com.freelancer.freelancer_platform.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.freelancer.freelancer_platform.entity.User;
+import com.freelancer.freelancer_platform.dto.UserRequest;
+import com.freelancer.freelancer_platform.dto.UserResponse;
 import com.freelancer.freelancer_platform.service.UserService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +24,8 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.saveUser(user);
+    public UserResponse createUser(@Valid @RequestBody UserRequest request) {
+        return userService.saveUser(request);
     }
     
 }

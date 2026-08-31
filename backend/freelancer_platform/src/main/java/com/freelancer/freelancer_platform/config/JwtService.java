@@ -2,7 +2,6 @@ package com.freelancer.freelancer_platform.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -36,5 +35,15 @@ public class JwtService {
         return token;
 
         
+    }
+
+    public String extractEmail(String token){
+        return Jwts.parser()
+              .verifyWith(Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8)))
+              .build()
+              .parseSignedClaims(token)
+              .getPayload()
+              .getSubject();
+
     }
 }

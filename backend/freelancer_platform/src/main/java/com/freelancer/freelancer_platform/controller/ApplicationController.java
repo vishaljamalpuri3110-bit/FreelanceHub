@@ -28,6 +28,12 @@ public class ApplicationController {
         this.applicationService = applicationService;
     }
 
+    @GetMapping("/my")
+public List<ApplicationResponse> getMyApplications() {
+
+    return applicationService.getMyApplications();
+}
+
     @PostMapping
     public ApplicationResponse createApplication(
             @Valid @RequestBody ApplicationRequest request) {

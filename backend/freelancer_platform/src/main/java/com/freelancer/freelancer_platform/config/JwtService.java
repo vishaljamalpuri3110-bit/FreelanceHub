@@ -46,4 +46,14 @@ public class JwtService {
               .getSubject();
 
     }
+
+    public boolean isTokenValid(String token) {
+
+    try {
+        extractEmail(token);
+        return true;
+    } catch (Exception e) {
+        return false;
+    }
+}
 }

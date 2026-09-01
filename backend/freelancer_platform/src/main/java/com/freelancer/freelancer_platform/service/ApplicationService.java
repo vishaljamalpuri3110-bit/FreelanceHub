@@ -2,6 +2,8 @@ package com.freelancer.freelancer_platform.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.freelancer.freelancer_platform.dto.ApplicationRequest;
@@ -36,20 +38,39 @@ public class ApplicationService {
     // CREATE APPLICATION
     public ApplicationResponse createApplication(ApplicationRequest request) {
 
+        System.out.println("CREATE APPLICATION SERVICE REACHED");
         Project project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        User freelancer = userRepository.findById(request.getFreelancerId())
-                .orElseThrow(() -> new RuntimeException("Freelancer not found"));
+        Authentication authentication =
+        SecurityContextHolder.getContext().getAuthentication();
+
+String email = authentication.getName();
+
+User freelancer = userRepository.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean alreadyApplied =
+        applicationRepository
+                .findByProjectIdAndFreelancerId(
+                        project.getId(),
+                        freelancer.getId()
+                )
+                .isPresent();
+
+if (alreadyApplied) {
+    throw new RuntimeException(
+            "You have already applied to this project"
+    );
+}
 
         Application application = new Application();
 
-        application.setProject(project);
-        application.setFreelancer(freelancer);
-        application.setCoverLetter(request.getCoverLetter());
-        application.setProposedBudget(request.getProposedBudget());
-
-        application.setStatus(ApplicationStatus.PENDING);
+application.setProject(project);
+application.setFreelancer(freelancer);
+application.setCoverLetter(request.getCoverLetter());
+application.setProposedBudget(request.getProposedBudget());
+application.setStatus(ApplicationStatus.PENDING);
 
         Application saved = applicationRepository.save(application);
 
@@ -83,36 +104,67 @@ public class ApplicationService {
         return convertToResponse(application);
     }
 
-    // ACCEPT
-    public ApplicationResponse acceptApplication(Long id) {
+ // ACCEPT
+public ApplicationResponse acceptApplication(Long id) {
 
-        Application application = applicationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+    Application application = applicationRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Application not found"));
 
-        application.setStatus(ApplicationStatus.ACCEPTED);
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
 
-        Project project = application.getProject();
-        project.setStatus(ProjectStatus.IN_PROGRESS);
+    String email = authentication.getName();
 
-        projectRepository.save(project);
+    User client = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Application updated = applicationRepository.save(application);
-
-        return convertToResponse(updated);
+    // Check project ownership
+    if (!application.getProject().getClient().getId().equals(client.getId())) {
+        throw new RuntimeException(
+                "You are not allowed to accept applications for this project"
+        );
     }
 
-    // REJECT
-    public ApplicationResponse rejectApplication(Long id) {
+    application.setStatus(ApplicationStatus.ACCEPTED);
 
-        Application application = applicationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
+    Project project = application.getProject();
+    project.setStatus(ProjectStatus.IN_PROGRESS);
 
-        application.setStatus(ApplicationStatus.REJECTED);
+    projectRepository.save(project);
 
-        Application updated = applicationRepository.save(application);
+    Application updated = applicationRepository.save(application);
 
-        return convertToResponse(updated);
+    return convertToResponse(updated);
+}
+
+
+// REJECT
+public ApplicationResponse rejectApplication(Long id) {
+
+    Application application = applicationRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Application not found"));
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User client = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    // Check project ownership
+    if (!application.getProject().getClient().getId().equals(client.getId())) {
+        throw new RuntimeException(
+                "You are not allowed to reject applications for this project"
+        );
     }
+
+    application.setStatus(ApplicationStatus.REJECTED);
+
+    Application updated = applicationRepository.save(application);
+
+    return convertToResponse(updated);
+}
 
     // DELETE
     public void deleteApplication(Long id) {
@@ -168,6 +220,23 @@ public class ApplicationService {
 
                 return response;
             })
+            .toList();
+    }
+
+    public List<ApplicationResponse> getMyApplications() {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User freelancer = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return applicationRepository
+            .findByFreelancerId(freelancer.getId())
+            .stream()
+            .map(this::convertToResponse)
             .toList();
 }
 }

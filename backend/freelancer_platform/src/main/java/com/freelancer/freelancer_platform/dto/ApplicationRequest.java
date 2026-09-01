@@ -9,8 +9,7 @@ public class ApplicationRequest {
     @NotNull
     private Long projectId;
 
-    @NotNull
-    private Long freelancerId;
+    
 
     @NotBlank
     private String coverLetter;
@@ -30,15 +29,7 @@ public class ApplicationRequest {
     }
 
 
-    public Long getFreelancerId() {
-        return freelancerId;
-    }
-
-
-    public void setFreelancerId(Long freelancerId) {
-        this.freelancerId = freelancerId;
-    }
-
+    
 
     public String getCoverLetter() {
         return coverLetter;

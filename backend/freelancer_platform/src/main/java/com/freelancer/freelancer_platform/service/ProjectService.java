@@ -1,7 +1,8 @@
 package com.freelancer.freelancer_platform.service;
 
 import java.util.List;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.freelancer.freelancer_platform.dto.ProjectRequest;
@@ -28,26 +29,28 @@ public class ProjectService {
     
     public ProjectResponse createProject(ProjectRequest request) {
 
-        User client = userRepository.findById(request.getClientId())
-                .orElseThrow(() -> new RuntimeException("Client not found"));
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
 
-        Project project = new Project();
+    String email = authentication.getName();
 
-        project.setClient(client);
-        project.setTitle(request.getTitle());
-        project.setDescription(request.getDescription());
-        project.setBudget(request.getBudget());
-        project.setDeadline(request.getDeadline());
-        project.setSkillsRequired(request.getSkillsRequired());
+    User client = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        
-        project.setStatus(ProjectStatus.OPEN);
+    Project project = new Project();
 
-        Project saved = projectRepository.save(project);
+    project.setClient(client);
+    project.setTitle(request.getTitle());
+    project.setDescription(request.getDescription());
+    project.setBudget(request.getBudget());
+    project.setDeadline(request.getDeadline());
+    project.setSkillsRequired(request.getSkillsRequired());
+    project.setStatus(ProjectStatus.OPEN);
 
-        return convertToResponse(saved);
-    }
+    Project saved = projectRepository.save(project);
 
+    return convertToResponse(saved);
+}
 
     
     public List<ProjectResponse> getAllProjects() {

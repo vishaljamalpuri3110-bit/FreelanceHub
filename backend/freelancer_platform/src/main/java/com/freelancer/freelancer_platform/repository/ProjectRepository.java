@@ -16,4 +16,6 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     List<Project> findByBudgetBetween(Double minBudget,Double maxBudget);
 
     List<Project> findByStatusAndSkillsRequiredContainingIgnoreCase(ProjectStatus projectStatus,String skill);
+
+    List<Project> findByClientId(Long clientId);
 }

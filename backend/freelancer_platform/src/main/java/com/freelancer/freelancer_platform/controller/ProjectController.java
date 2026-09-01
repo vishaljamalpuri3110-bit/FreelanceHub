@@ -86,5 +86,10 @@ public List<ProjectResponse> searchProjects(
         projectService.deleteProject(id);
     }
 
-    
+    @GetMapping("/client/{clientId}")
+    public List<ProjectResponse> getProjectsByClient(
+        @PathVariable Long clientId) {
+            return projectService.getProjectsByClient(clientId);
+        
+    }
 }

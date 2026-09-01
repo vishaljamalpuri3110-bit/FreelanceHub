@@ -154,6 +154,14 @@ public class ProjectService {
     return projects.stream()
             .map(this::convertToResponse)
             .toList();
+    }
+
+    public List<ProjectResponse> getProjectsByClient(Long clientId) {
+
+    return projectRepository.findByClientId(clientId)
+            .stream()
+            .map(this::convertToResponse)
+            .toList();
 }
 
 }

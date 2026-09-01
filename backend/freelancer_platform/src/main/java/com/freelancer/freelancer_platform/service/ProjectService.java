@@ -25,7 +25,7 @@ public class ProjectService {
         this.userRepository = userRepository;
     }
 
-    // CREATE
+    
     public ProjectResponse createProject(ProjectRequest request) {
 
         User client = userRepository.findById(request.getClientId())
@@ -40,7 +40,7 @@ public class ProjectService {
         project.setDeadline(request.getDeadline());
         project.setSkillsRequired(request.getSkillsRequired());
 
-        // New projects are OPEN by default
+        
         project.setStatus(ProjectStatus.OPEN);
 
         Project saved = projectRepository.save(project);
@@ -49,7 +49,7 @@ public class ProjectService {
     }
 
 
-    // GET ALL
+    
     public List<ProjectResponse> getAllProjects() {
 
         return projectRepository.findAll()
@@ -59,7 +59,7 @@ public class ProjectService {
     }
 
 
-    // GET BY ID
+    
     public ProjectResponse getProjectById(Long id) {
 
         Project project = projectRepository.findById(id)
@@ -69,7 +69,7 @@ public class ProjectService {
     }
 
 
-    // UPDATE
+    
     public ProjectResponse updateProject(Long id, ProjectRequest request) {
 
         Project project = projectRepository.findById(id)
@@ -87,7 +87,6 @@ public class ProjectService {
     }
 
 
-    // DELETE
     public void deleteProject(Long id) {
 
         Project project = projectRepository.findById(id)
@@ -97,7 +96,6 @@ public class ProjectService {
     }
 
 
-    // ENTITY → RESPONSE
     private ProjectResponse convertToResponse(Project project) {
 
         ProjectResponse response = new ProjectResponse();
@@ -119,4 +117,43 @@ public class ProjectService {
 
         return response;
     }
+
+    public List<ProjectResponse> searchProjects(
+        String skill,
+        Double minBudget,
+        Double maxBudget,
+        ProjectStatus status) {
+
+    List<Project> projects;
+
+    if (skill != null && status != null) {
+
+        projects = projectRepository
+                .findByStatusAndSkillsRequiredContainingIgnoreCase(status, skill);
+
+    } else if (skill != null) {
+
+        projects = projectRepository
+                .findBySkillsRequiredContainingIgnoreCase(skill);
+
+    } else if (minBudget != null && maxBudget != null) {
+
+        projects = projectRepository
+                .findByBudgetBetween(minBudget, maxBudget);
+
+    } else if (status != null) {
+
+        projects = projectRepository
+                .findByStatus(status);
+
+    } else {
+
+        projects = projectRepository.findAll();
+    }
+
+    return projects.stream()
+            .map(this::convertToResponse)
+            .toList();
+}
+
 }

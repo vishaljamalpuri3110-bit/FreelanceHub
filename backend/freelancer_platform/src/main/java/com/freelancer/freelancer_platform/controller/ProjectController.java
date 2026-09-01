@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.freelancer.freelancer_platform.dto.ProjectRequest;
 import com.freelancer.freelancer_platform.dto.ProjectResponse;
+import com.freelancer.freelancer_platform.entity.ProjectStatus;
 import com.freelancer.freelancer_platform.service.ProjectService;
 
 import jakarta.validation.Valid;
@@ -43,8 +45,21 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
+    @GetMapping("/search")
+public List<ProjectResponse> searchProjects(
+        @RequestParam(required = false) String skill,
+        @RequestParam(required = false) Double minBudget,
+        @RequestParam(required = false) Double maxBudget,
+        @RequestParam(required = false) ProjectStatus status) {
 
-    // GET BY ID
+    return projectService.searchProjects(
+            skill,
+            minBudget,
+            maxBudget,
+            status
+    );
+}
+    
     @GetMapping("/{id}")
     public ProjectResponse getProjectById(
             @PathVariable Long id) {
@@ -70,4 +85,6 @@ public class ProjectController {
 
         projectService.deleteProject(id);
     }
+
+    
 }

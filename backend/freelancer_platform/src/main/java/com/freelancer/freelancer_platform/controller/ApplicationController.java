@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.freelancer.freelancer_platform.dto.ApplicationRequest;
 import com.freelancer.freelancer_platform.dto.ApplicationResponse;
+import com.freelancer.freelancer_platform.dto.TeamMemberResponse;
 import com.freelancer.freelancer_platform.service.ApplicationService;
 
 import jakarta.validation.Valid;
@@ -74,5 +75,11 @@ public class ApplicationController {
             @PathVariable Long id) {
 
         applicationService.deleteApplication(id);
+    }
+
+    @GetMapping("/project/{projectId}/team")
+    public List<TeamMemberResponse> getTeamMembers(
+        @PathVariable Long projectId) {
+            return applicationService.getTeamMembers(projectId);
     }
 }

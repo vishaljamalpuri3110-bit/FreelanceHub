@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.freelancer.freelancer_platform.dto.ApplicationRequest;
 import com.freelancer.freelancer_platform.dto.ApplicationResponse;
+import com.freelancer.freelancer_platform.dto.TeamMemberResponse;
 import com.freelancer.freelancer_platform.entity.Application;
 import com.freelancer.freelancer_platform.entity.ApplicationStatus;
 import com.freelancer.freelancer_platform.entity.Project;
@@ -145,4 +146,28 @@ public class ApplicationService {
 
         return response;
     }
+
+    public List<TeamMemberResponse> getTeamMembers(Long projectId) {
+
+    return applicationRepository
+            .findByProjectIdAndStatus(
+                    projectId,
+                    ApplicationStatus.ACCEPTED
+            )
+            .stream()
+            .map(application -> {
+
+                User freelancer = application.getFreelancer();
+
+                TeamMemberResponse response = new TeamMemberResponse();
+
+                response.setUserId(freelancer.getId());
+                response.setName(freelancer.getName());
+                response.setEmail(freelancer.getEmail());
+                response.setRole(freelancer.getRole().name());
+
+                return response;
+            })
+            .toList();
+}
 }

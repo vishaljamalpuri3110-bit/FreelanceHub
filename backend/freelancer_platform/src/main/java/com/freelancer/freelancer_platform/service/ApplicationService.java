@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.freelancer.freelancer_platform.dto.ApplicationRequest;
 import com.freelancer.freelancer_platform.dto.ApplicationResponse;
+import com.freelancer.freelancer_platform.dto.NotificationRequest;
 import com.freelancer.freelancer_platform.dto.TeamMemberResponse;
 import com.freelancer.freelancer_platform.entity.Application;
 import com.freelancer.freelancer_platform.entity.ApplicationStatus;
@@ -24,15 +25,17 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public ApplicationService(
             ApplicationRepository applicationRepository,
             ProjectRepository projectRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,NotificationService notificationService) {
 
         this.applicationRepository = applicationRepository;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
+        this.notificationService=notificationService;
     }
 
     // CREATE APPLICATION
@@ -134,6 +137,18 @@ public ApplicationResponse acceptApplication(Long id) {
 
     Application updated = applicationRepository.save(application);
 
+    NotificationRequest notificationRequest = new NotificationRequest();
+
+notificationRequest.setUserId(application.getFreelancer().getId());
+notificationRequest.setMessage(
+        "Your application for project '" +
+        project.getTitle() +
+        "' has been accepted."
+);
+notificationRequest.setType("APPLICATION_ACCEPTED");
+
+notificationService.createNotification(notificationRequest);
+
     return convertToResponse(updated);
 }
 
@@ -162,6 +177,18 @@ public ApplicationResponse rejectApplication(Long id) {
     application.setStatus(ApplicationStatus.REJECTED);
 
     Application updated = applicationRepository.save(application);
+
+    NotificationRequest notificationRequest = new NotificationRequest();
+
+notificationRequest.setUserId(application.getFreelancer().getId());
+notificationRequest.setMessage(
+        "Your application for project '" +
+        application.getProject().getTitle() +
+        "' has been rejected."
+);
+notificationRequest.setType("APPLICATION_REJECTED");
+
+notificationService.createNotification(notificationRequest);
 
     return convertToResponse(updated);
 }

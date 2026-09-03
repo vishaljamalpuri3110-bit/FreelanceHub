@@ -1,0 +1,177 @@
+<div class="container py-5 max-w-1000">
+  
+  <h2 class="fw-bold mb-4">Settings</h2>
+
+  <div *ngIf="successMsg" class="alert alert-success py-2 rounded-lg mb-4">
+    <i class="bi bi-check-circle me-2"></i> {{ successMsg }}
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Sidebar -->
+    <div class="col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm">
+        <div class="list-group list-group-flush">
+          <button class="list-group-item list-group-item-action border-0 py-3 d-flex align-items-center gap-2" 
+                  [class.active]="activeTab === 'profile'"
+                  [class.text-primary-accent]="activeTab === 'profile'"
+                  (click)="activeTab = 'profile'">
+            <i class="bi bi-person"></i> Profile
+          </button>
+          <button class="list-group-item list-group-item-action border-0 py-3 d-flex align-items-center gap-2" 
+                  [class.active]="activeTab === 'notifications'"
+                  [class.text-primary-accent]="activeTab === 'notifications'"
+                  (click)="activeTab = 'notifications'">
+            <i class="bi bi-bell"></i> Notifications
+          </button>
+          <button class="list-group-item list-group-item-action border-0 py-3 d-flex align-items-center gap-2" 
+                  [class.active]="activeTab === 'security'"
+                  [class.text-primary-accent]="activeTab === 'security'"
+                  (click)="activeTab = 'security'">
+            <i class="bi bi-shield-lock"></i> Security
+          </button>
+          <button class="list-group-item list-group-item-action border-0 py-3 d-flex align-items-center gap-2" 
+                  [class.active]="activeTab === 'billing'"
+                  [class.text-primary-accent]="activeTab === 'billing'"
+                  (click)="activeTab = 'billing'">
+            <i class="bi bi-credit-card"></i> Billing
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-8 col-lg-9">
+      
+      <!-- Profile Settings -->
+      <div class="card border-0 shadow-sm" *ngIf="activeTab === 'profile'">
+        <div class="card-body p-4 p-md-5">
+          <h4 class="fw-bold mb-4">Public Profile</h4>
+          
+          <div class="d-flex align-items-center gap-4 mb-5">
+            <img [src]="user?.avatarUrl" class="rounded-circle border" width="100" height="100">
+            <div>
+              <button class="btn btn-outline-primary btn-sm mb-2 px-4 rounded-pill">Change Photo</button>
+              <p class="text-muted small mb-0">JPG, GIF or PNG. Max size of 800K</p>
+            </div>
+          </div>
+
+          <form (ngSubmit)="saveProfile()">
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-medium small">Full Name</label>
+                <input type="text" class="form-control" name="name" [(ngModel)]="name">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium small">Email Address</label>
+                <input type="email" class="form-control" name="email" [(ngModel)]="email">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium small">Location</label>
+                <input type="text" class="form-control" name="location" [(ngModel)]="location">
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary rounded-pill px-4">Save Changes</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Notifications Settings -->
+      <div class="card border-0 shadow-sm" *ngIf="activeTab === 'notifications'">
+        <div class="card-body p-4 p-md-5">
+          <h4 class="fw-bold mb-4">Notification Preferences</h4>
+          
+          <form (ngSubmit)="saveNotifications()">
+            
+            <div class="mb-4">
+              <h6 class="fw-bold mb-3">Email Notifications</h6>
+              
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="emailNotif" name="emailNotif" [(ngModel)]="notifications.email">
+                <label class="form-check-label" for="emailNotif">
+                  <strong>Activity on my account</strong>
+                  <br>
+                  <small class="text-muted">Get notified when someone messages you or applies to your project.</small>
+                </label>
+              </div>
+              
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="marketingNotif" name="marketingNotif" [(ngModel)]="notifications.marketing">
+                <label class="form-check-label" for="marketingNotif">
+                  <strong>Marketing and Tips</strong>
+                  <br>
+                  <small class="text-muted">Receive weekly newsletters and tips to improve your profile.</small>
+                </label>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="mb-5">
+              <h6 class="fw-bold mb-3">Push Notifications</h6>
+              
+              <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="pushNotif" name="pushNotif" [(ngModel)]="notifications.push">
+                <label class="form-check-label" for="pushNotif">
+                  <strong>Browser Push Notifications</strong>
+                  <br>
+                  <small class="text-muted">Get notified immediately when you're active on the site.</small>
+                </label>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary rounded-pill px-4">Save Preferences</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Security Settings -->
+      <div class="card border-0 shadow-sm" *ngIf="activeTab === 'security'">
+        <div class="card-body p-4 p-md-5">
+          <h4 class="fw-bold mb-4">Security Settings</h4>
+          
+          <form (ngSubmit)="saveSecurity()">
+            <div class="mb-4">
+              <h6 class="fw-bold mb-3">Change Password</h6>
+              
+              <div class="mb-3">
+                <label class="form-label fw-medium small">Current Password</label>
+                <input type="password" class="form-control" name="currentPassword">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium small">New Password</label>
+                <input type="password" class="form-control" name="newPassword">
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium small">Confirm New Password</label>
+                <input type="password" class="form-control" name="confirmPassword">
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="mb-5">
+              <h6 class="fw-bold mb-3">Two-Factor Authentication</h6>
+              <p class="text-muted small mb-3">Add an extra layer of security to your account.</p>
+              <button type="button" class="btn btn-outline-primary rounded-pill px-4">Enable 2FA</button>
+            </div>
+            
+            <button type="submit" class="btn btn-primary rounded-pill px-4">Update Security</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Billing Settings -->
+      <div class="card border-0 shadow-sm" *ngIf="activeTab === 'billing'">
+        <div class="card-body p-4 p-md-5 text-center">
+          <i class="bi bi-credit-card text-muted mb-3 d-block" style="font-size: 3rem;"></i>
+          <h4 class="fw-bold">Billing Information</h4>
+          <p class="text-muted mb-4">Manage your payment methods and view billing history.</p>
+          <button class="btn btn-primary rounded-pill px-4">Add Payment Method</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

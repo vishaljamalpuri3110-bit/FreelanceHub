@@ -1,0 +1,106 @@
+<div class="bg-primary-accent text-white py-4">
+  <div class="container">
+    <h2 class="fw-bold mb-2">Find Freelancers</h2>
+    <p class="mb-0 opacity-75">Hire top talent for your next project.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-4">
+    
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3">
+      <div class="card shadow-sm border-0 sticky-top" style="top: 100px; z-index: 1;">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">Filters</h5>
+          
+          <div class="mb-4">
+            <label class="form-label fw-medium small">Search</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+              <input type="text" class="form-control border-start-0 ps-0" placeholder="Name or title..." 
+                     [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-medium small">Skill</label>
+            <select class="form-select" [(ngModel)]="selectedSkill" (change)="onSearch()">
+              <option *ngFor="let skill of skills" [value]="skill">{{ skill }}</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary w-100 fw-medium" (click)="onSearch()">Apply Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-lg-9">
+      
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="mb-0 text-muted">{{ freelancers.length }} freelancers found</h5>
+        <select class="form-select w-auto">
+          <option>Relevance</option>
+          <option>Rating: High to Low</option>
+          <option>Hourly Rate: Low to High</option>
+        </select>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary-accent" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && freelancers.length === 0" class="text-center py-5 bg-white rounded-lg shadow-sm border-0">
+        <i class="bi bi-people text-muted mb-3 d-block" style="font-size: 3rem;"></i>
+        <h4 class="fw-bold">No freelancers found</h4>
+        <p class="text-muted">Try adjusting your search or filters to find what you're looking for.</p>
+        <button class="btn btn-outline-primary" (click)="searchQuery=''; selectedSkill='All'; onSearch()">Clear Filters</button>
+      </div>
+
+      <!-- Freelancers List -->
+      <div *ngIf="!loading">
+        <div class="card border-0 shadow-sm mb-4 card-hover" *ngFor="let freelancer of freelancers">
+          <div class="card-body p-4">
+            <div class="row align-items-center">
+              
+              <div class="col-md-2 text-center mb-3 mb-md-0">
+                <img [src]="freelancer.avatarUrl" class="rounded-circle border border-2 border-light shadow-sm" width="80" height="80">
+              </div>
+              
+              <div class="col-md-7 mb-3 mb-md-0">
+                <h5 class="fw-bold mb-1">
+                  <a [routerLink]="['/freelancer', freelancer.id]" class="text-dark text-decoration-none">{{ freelancer.name }}</a>
+                </h5>
+                <p class="text-muted mb-2">{{ freelancer.title }}</p>
+                
+                <div class="d-flex flex-wrap text-muted small mb-3 gap-3">
+                  <span><i class="bi bi-geo-alt me-1"></i> {{ freelancer.location }}</span>
+                  <span class="text-warning fw-bold"><i class="bi bi-star-fill me-1"></i> {{ freelancer.rating }}</span>
+                  <span><i class="bi bi-check-circle me-1"></i> {{ freelancer.completedProjects }} projects</span>
+                </div>
+                
+                <div>
+                  <span class="badge bg-light text-dark border me-2 mb-2" *ngFor="let skill of freelancer.skills">{{ skill }}</span>
+                </div>
+              </div>
+              
+              <div class="col-md-3 text-md-end border-start-md ps-md-4">
+                <h4 class="fw-bold text-primary-accent mb-1">${{ freelancer.hourlyRate }}/hr</h4>
+                <p class="text-muted small mb-3">{{ freelancer.availability }}</p>
+                <a [routerLink]="['/freelancer', freelancer.id]" class="btn btn-outline-primary w-100 rounded-pill mb-2">View Profile</a>
+                <button class="btn btn-primary w-100 rounded-pill">Invite to Project</button>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

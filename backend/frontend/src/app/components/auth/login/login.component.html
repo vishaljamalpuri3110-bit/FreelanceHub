@@ -1,0 +1,91 @@
+<div class="container-fluid min-vh-100 d-flex flex-column p-0">
+  <div class="row g-0 flex-grow-1">
+    
+    <!-- Left Side: Visual/Branding -->
+    <div class="col-md-6 bg-primary-accent d-none d-md-flex flex-column justify-content-center align-items-center text-white p-5 position-relative overflow-hidden">
+      <div class="z-1 text-center max-w-500">
+        <h1 class="display-4 fw-bold mb-4">Welcome Back to <br> FreelancerHub</h1>
+        <p class="lead opacity-75">Connect, collaborate, and create amazing things together. Your next big opportunity awaits.</p>
+      </div>
+      <!-- Abstract shapes -->
+      <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 300px; height: 300px; top: -50px; left: -50px;"></div>
+      <div class="position-absolute rounded-circle bg-white opacity-10" style="width: 400px; height: 400px; bottom: -100px; right: -100px;"></div>
+    </div>
+
+    <!-- Right Side: Login Form -->
+    <div class="col-md-6 d-flex justify-content-center align-items-center p-4 bg-white">
+      <div class="w-100" style="max-width: 400px;">
+        
+        <div class="text-center mb-4 d-md-none">
+          <h2 class="text-primary-accent fw-bold"><i class="bi bi-layers-fill me-1"></i> FreelancerHub</h2>
+        </div>
+
+        <h3 class="fw-bold mb-1">Sign in</h3>
+        <p class="text-muted mb-4">Welcome back! Please enter your details.</p>
+
+        <!-- Role Selector -->
+        <div class="d-flex mb-4 p-1 bg-light rounded-pill">
+          <button class="btn flex-fill rounded-pill fw-medium" 
+                  [class.btn-white]="role === 'freelancer'"
+                  [class.shadow-sm]="role === 'freelancer'"
+                  [class.text-primary-accent]="role === 'freelancer'"
+                  [class.text-muted]="role !== 'freelancer'"
+                  (click)="setRole('freelancer')">
+            I'm a Freelancer
+          </button>
+          <button class="btn flex-fill rounded-pill fw-medium"
+                  [class.btn-white]="role === 'client'"
+                  [class.shadow-sm]="role === 'client'"
+                  [class.text-primary-accent]="role === 'client'"
+                  [class.text-muted]="role !== 'client'"
+                  (click)="setRole('client')">
+            I'm a Client
+          </button>
+        </div>
+
+        <!-- Alert Error -->
+        <div *ngIf="errorMsg" class="alert alert-danger py-2 small rounded-lg">
+          <i class="bi bi-exclamation-circle me-1"></i> {{ errorMsg }}
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          
+          <div class="mb-3">
+            <label class="form-label fw-medium small">Email</label>
+            <input type="email" class="form-control" formControlName="email" placeholder="Enter your email"
+                   [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            <div class="invalid-feedback">Please enter a valid email.</div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label fw-medium small">Password</label>
+            <input type="password" class="form-control" formControlName="password" placeholder="••••••••"
+                   [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <div class="invalid-feedback">Password is required.</div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="remember">
+              <label class="form-check-label small text-muted" for="remember">Remember for 30 days</label>
+            </div>
+            <a href="#" class="small text-primary-accent text-decoration-none fw-medium">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 py-2 mb-3 fw-medium">Sign In</button>
+
+          <button type="button" class="btn btn-outline-secondary w-100 py-2 mb-4 text-dark bg-white border-light-subtle d-flex justify-content-center align-items-center gap-2">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google" width="18">
+            Sign in with Google
+          </button>
+          
+        </form>
+
+        <p class="text-center text-muted small mt-4">
+          Don't have an account? <a routerLink="/register" class="text-primary-accent fw-bold text-decoration-none">Sign up</a>
+        </p>
+
+      </div>
+    </div>
+  </div>
+</div>

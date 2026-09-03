@@ -1,0 +1,65 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
+
+@Component({
+  selector: 'app-register',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
+})
+export class RegisterComponent {
+  registerForm: FormGroup;
+  role: 'freelancer' | 'client' = 'freelancer';
+  successMsg = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router
+  ) {
+    this.registerForm = this.fb.group({
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
+      location: ['', Validators.required],
+      terms: [false, Validators.requiredTrue],
+      // Freelancer specific
+      skills: [''],
+      experience: [''],
+      hourlyRate: [''],
+      bio: [''],
+      // Client specific
+      companyName: [''],
+      industry: [''],
+      companyDescription: ['']
+    }, { validators: this.passwordMatchValidator });
+  }
+
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('password')?.value === g.get('confirmPassword')?.value
+      ? null : { mismatch: true };
+  }
+
+  setRole(selectedRole: 'freelancer' | 'client') {
+    this.role = selectedRole;
+    // Reset specific validations based on role in a real app
+  }
+
+  onSubmit() {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    // Simulate successful registration
+    this.successMsg = 'Registration successful! Redirecting to login...';
+    
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 2000);
+  }
+}

@@ -1,0 +1,269 @@
+<div *ngIf="loading" class="min-vh-100 d-flex justify-content-center align-items-center">
+  <div class="spinner-border text-primary-accent" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!loading && !project" class="container py-5 text-center min-vh-100">
+  <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+  <h3 class="mt-3">Project Not Found</h3>
+  <p class="text-muted">The project you are looking for does not exist or has been removed.</p>
+  <a routerLink="/projects" class="btn btn-primary mt-3">Back to Projects</a>
+</div>
+
+<div *ngIf="!loading && project" class="bg-light min-vh-100 pb-5">
+  <!-- Header -->
+  <div class="bg-white border-bottom pt-5 pb-4">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-primary-accent bg-opacity-10 text-primary-accent px-3 py-2 rounded-pill"><i class="bi bi-folder me-1"></i> {{ project.category }}</span>
+        <span class="text-muted small">Posted {{ project.createdAt | date:'mediumDate' }}</span>
+      </div>
+      <h1 class="fw-bold mb-3">{{ project.title }}</h1>
+      <div class="d-flex flex-wrap text-muted gap-4">
+        <span><i class="bi bi-person me-2"></i>{{ project.clientName }}</span>
+        <span><i class="bi bi-globe me-2"></i>Remote</span>
+        <span><i class="bi bi-people me-2"></i>{{ project.applicantsCount }} Applicants</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mt-4">
+    <div class="row g-4">
+      
+      <!-- Main Details -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-lg mb-4">
+          <div class="card-body p-4 p-md-5">
+            
+            <h4 class="fw-bold mb-3">Project Description</h4>
+            <p class="text-muted mb-5" style="white-space: pre-line;">{{ project.description }}</p>
+            
+            <h4 class="fw-bold mb-3">Required Skills</h4>
+            <div class="mb-5">
+              <span class="badge bg-light text-dark border me-2 mb-2 px-3 py-2 fs-6 fw-normal" *ngFor="let skill of project.requiredSkills">{{ skill }}</span>
+            </div>
+
+            <h4 class="fw-bold mb-3">Project Timeline</h4>
+            <ul class="list-unstyled text-muted">
+              <li class="mb-2"><i class="bi bi-calendar-event me-2 text-primary-accent"></i> <strong>Deadline:</strong> {{ project.deadline | date:'longDate' }}</li>
+              <li class="mb-2"><i class="bi bi-clock me-2 text-primary-accent"></i> <strong>Duration:</strong> {{ getProjectDuration() }}</li>
+            </ul>
+
+          </div>
+        </div>
+      </div>
+        <!-- Applications -->
+        <div *ngIf="isClient" class="card border-0 shadow-sm rounded-lg mb-4">
+
+          <div class="card-body p-4 p-md-5">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="fw-bold mb-0">
+                Applications
+              </h4>
+
+              <span class="badge bg-primary rounded-pill">
+                {{ applications.length }}
+              </span>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="loadingApplications"
+                 class="text-center py-4">
+
+              <div class="spinner-border text-primary"
+                   role="status">
+
+                <span class="visually-hidden">
+                  Loading applications...
+                </span>
+
+              </div>
+
+            </div>
+
+            <!-- No Applications -->
+            <div *ngIf="!loadingApplications && applications.length === 0"
+                 class="text-center py-4">
+
+              <i class="bi bi-file-earmark-x text-muted"
+                 style="font-size: 2.5rem;">
+              </i>
+
+              <h6 class="fw-bold mt-3">
+                No Applications Yet
+              </h6>
+
+              <p class="text-muted small mb-0">
+                No freelancers have applied to this project yet.
+              </p>
+
+            </div>
+
+            <!-- Applications List -->
+            <div *ngIf="!loadingApplications && applications.length > 0">
+
+              <div *ngFor="let app of applications"
+                   class="border rounded p-3 mb-3">
+
+                <div class="d-flex justify-content-between align-items-start">
+
+                  <div>
+
+                    <h5 class="fw-bold mb-1">
+                      {{ app.freelancerName }}
+                    </h5>
+
+                    <p class="text-muted small mb-2">
+                      <i class="bi bi-currency-dollar me-1"></i>
+                      Proposed Budget:
+                      <strong>
+                        ${{ app.proposedBudget }}
+                      </strong>
+                    </p>
+
+                  </div>
+
+                  <span class="badge"
+                        [ngClass]="{
+                          'bg-warning text-dark': app.status === 'PENDING',
+                          'bg-success': app.status === 'ACCEPTED',
+                          'bg-danger': app.status === 'REJECTED'
+                        }">
+
+                    {{ app.status | titlecase }}
+
+                  </span>
+
+                </div>
+
+                <div *ngIf="app.coverLetter"
+                     class="bg-light rounded p-3 mb-3">
+
+                  <small class="text-muted d-block mb-1">
+                    Cover Letter
+                  </small>
+
+                  <p class="mb-0 small">
+                    {{ app.coverLetter }}
+                  </p>
+
+                </div>
+
+                <!-- Actions -->
+                <div *ngIf="app.status === 'PENDING'"
+                     class="d-flex gap-2">
+
+                  <button
+                    class="btn btn-success btn-sm rounded-pill px-3"
+                    (click)="acceptApplication(app.id)"
+                    [disabled]="processingApplicationId === app.id">
+
+                    <span
+                      *ngIf="processingApplicationId === app.id"
+                      class="spinner-border spinner-border-sm me-1">
+                    </span>
+
+                    <i
+                      *ngIf="processingApplicationId !== app.id"
+                      class="bi bi-check-circle me-1">
+                    </i>
+
+                    Accept
+
+                  </button>
+
+                  <button
+                    class="btn btn-outline-danger btn-sm rounded-pill px-3"
+                    (click)="rejectApplication(app.id)"
+                    [disabled]="processingApplicationId === app.id">
+
+                    <i class="bi bi-x-circle me-1"></i>
+                    Reject
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      <!-- Sidebar -->
+      <div class="col-lg-4">
+        
+        <!-- Apply Card -->
+        <div class="card border-0 shadow-sm rounded-lg mb-4">
+          <div class="card-body p-4">
+            <h3 class="fw-bold text-primary-accent mb-1">${{ project.budget }}</h3>
+            <p class="text-muted mb-4">{{ project.projectType }}</p>
+
+            <ul class="list-unstyled mb-4">
+              <li class="mb-3 d-flex align-items-center">
+                <i class="bi bi-bar-chart text-muted me-3 fs-4"></i>
+                <div>
+                  <h6 class="mb-0 fw-bold">Experience Level</h6>
+                  <small class="text-muted">{{ project.experienceLevel }}</small>
+                </div>
+              </li>
+              <li class="mb-3 d-flex align-items-center">
+                <i class="bi bi-shield-check text-muted me-3 fs-4"></i>
+                <div>
+                  <h6 class="mb-0 fw-bold">Project Status</h6>
+                  <small class="text-muted">{{ project.status | titlecase }}</small>
+                </div>
+              </li>
+            </ul>
+
+            <div *ngIf="!isClient">
+              <button *ngIf="!hasApplied" 
+                      class="btn btn-primary w-100 py-2 fw-medium rounded-pill" 
+                      (click)="apply()"
+                      [disabled]="applying || project.status !== 'open'">
+                <span *ngIf="applying" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Apply for Project
+              </button>
+              
+              <button *ngIf="hasApplied" class="btn btn-success w-100 py-2 fw-medium rounded-pill" disabled>
+                <i class="bi bi-check-circle me-1"></i> Application Submitted
+              </button>
+            </div>
+            
+            <div *ngIf="isClient" class="alert alert-secondary small mb-0 text-center">
+              You are logged in as a Client.
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Client Info -->
+        <div class="card border-0 shadow-sm rounded-lg">
+  <div class="card-body p-4">
+    <h5 class="fw-bold mb-3">About the Client</h5>
+
+    <div class="d-flex align-items-center mb-3">
+      <div
+        class="bg-primary-accent text-white rounded-circle d-flex justify-content-center align-items-center me-3"
+        style="width: 50px; height: 50px; font-size: 20px;"
+      >
+        {{ project.clientName.charAt(0) }}
+      </div>
+
+      <div>
+        <h6 class="fw-bold mb-0">
+          {{ project.clientName }}
+        </h6>
+
+        <div class="text-muted small">
+          Client
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>

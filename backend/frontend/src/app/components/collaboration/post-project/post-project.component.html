@@ -1,0 +1,113 @@
+<div class="bg-primary-accent text-white py-4">
+  <div class="container">
+    <h2 class="fw-bold mb-2">Post a New Project</h2>
+    <p class="mb-0 opacity-75">Fill out the details below to find the perfect freelancer for your project.</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card border-0 shadow-sm rounded-lg">
+        <div class="card-body p-4 p-md-5">
+          
+          <div *ngIf="successMsg" class="alert alert-success py-3 mb-4 rounded-lg">
+            <i class="bi bi-check-circle me-1"></i> {{ successMsg }}
+          </div>
+
+          <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+            
+            <div class="mb-4">
+              <label class="form-label fw-bold">Project Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-lg" formControlName="title" placeholder="e.g. Build an E-commerce Website"
+                     [class.is-invalid]="projectForm.get('title')?.invalid && projectForm.get('title')?.touched">
+              <div class="invalid-feedback">Title is required.</div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold">Project Description <span class="text-danger">*</span></label>
+              <textarea class="form-control" formControlName="description" rows="5" placeholder="Describe the project scope, requirements, and deliverables..."
+                        [class.is-invalid]="projectForm.get('description')?.invalid && projectForm.get('description')?.touched"></textarea>
+              <div class="invalid-feedback">Description is required.</div>
+            </div>
+            
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+                <select class="form-select" formControlName="category"
+                        [class.is-invalid]="projectForm.get('category')?.invalid && projectForm.get('category')?.touched">
+                  <option value="" disabled selected>Select a category</option>
+                  <option value="Web Development">Web Development</option>
+                  <option value="Design">Design</option>
+                  <option value="Writing">Writing</option>
+                  <option value="Marketing">Marketing</option>
+                </select>
+                <div class="invalid-feedback">Category is required.</div>
+              </div>
+              
+              <div class="col-md-6">
+                <label class="form-label fw-bold">Required Skills <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="skills" placeholder="e.g. Angular, Node.js (comma separated)"
+                       [class.is-invalid]="projectForm.get('skills')?.invalid && projectForm.get('skills')?.touched">
+                <div class="invalid-feedback">Skills are required.</div>
+              </div>
+            </div>
+            
+            <div class="row g-4 mb-4">
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Budget ($) <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" formControlName="budget" placeholder="e.g. 500"
+                       [class.is-invalid]="projectForm.get('budget')?.invalid && projectForm.get('budget')?.touched">
+                <div class="invalid-feedback">Valid budget is required.</div>
+              </div>
+              
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Project Type <span class="text-danger">*</span></label>
+                <select class="form-select" formControlName="projectType">
+                  <option value="fixed">Fixed Price</option>
+                  <option value="hourly">Hourly</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label fw-bold">Deadline <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" formControlName="deadline"
+                       [class.is-invalid]="projectForm.get('deadline')?.invalid && projectForm.get('deadline')?.touched">
+                <div class="invalid-feedback">Deadline is required.</div>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <label class="form-label fw-bold">Required Experience Level</label>
+              <div class="d-flex gap-3 mt-2">
+                <div class="form-check border rounded p-3 flex-fill text-center">
+                  <input class="form-check-input float-none mx-auto mb-2 d-block" type="radio" formControlName="experienceLevel" id="expBeginner" value="beginner">
+                  <label class="form-check-label d-block" for="expBeginner">Beginner</label>
+                </div>
+                <div class="form-check border rounded p-3 flex-fill text-center">
+                  <input class="form-check-input float-none mx-auto mb-2 d-block" type="radio" formControlName="experienceLevel" id="expIntermediate" value="intermediate">
+                  <label class="form-check-label d-block" for="expIntermediate">Intermediate</label>
+                </div>
+                <div class="form-check border rounded p-3 flex-fill text-center">
+                  <input class="form-check-input float-none mx-auto mb-2 d-block" type="radio" formControlName="experienceLevel" id="expExpert" value="expert">
+                  <label class="form-check-label d-block" for="expExpert">Expert</label>
+                </div>
+              </div>
+            </div>
+            
+            <hr class="mb-4">
+            
+            <div class="d-flex justify-content-end gap-3">
+              <button type="button" class="btn btn-outline-secondary px-4 fw-medium" routerLink="/client/dashboard">Cancel</button>
+              <button type="submit" class="btn btn-primary px-5 fw-medium">Post Project</button>
+            </div>
+            
+          </form>
+
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>

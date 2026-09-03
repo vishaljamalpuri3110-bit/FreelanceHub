@@ -1,0 +1,432 @@
+<div *ngIf="loading" class="min-vh-100 d-flex justify-content-center align-items-center">
+  <div class="spinner-border text-primary-accent" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="!loading && !project" class="container py-5 text-center min-vh-100">
+  <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+  <h3 class="mt-3">Workspace Not Found</h3>
+</div>
+
+<div *ngIf="!loading && project" class="bg-light min-vh-100">
+
+  <!-- Workspace Header -->
+  <div class="bg-white border-bottom pt-4 pb-0">
+    <div class="container">
+
+      <div class="d-flex justify-content-between align-items-end mb-4">
+
+        <div>
+          <span
+            class="badge"
+            [ngClass]="{
+              'bg-primary': project.status === 'in-progress',
+              'bg-success': project.status === 'completed'
+            }">
+
+            <i class="bi bi-circle-fill me-1 small"></i>
+            {{ project.status | titlecase }}
+
+          </span>
+
+          <h2 class="fw-bold mt-2 mb-1">
+            {{ project.title }}
+          </h2>
+
+          <p class="text-muted small mb-0">
+            Client: {{ project.clientName }}
+          </p>
+        </div>
+
+        <div class="text-end">
+
+          <p class="text-muted small mb-1">
+            Overall Progress
+          </p>
+
+          <div class="d-flex align-items-center gap-2">
+
+            <div
+              class="progress flex-grow-1"
+              style="width: 150px; height: 8px;">
+
+              <div
+                class="progress-bar bg-primary-accent"
+                role="progressbar"
+                [style.width]="getProgress() + '%'">
+              </div>
+
+            </div>
+
+            <span class="fw-bold">
+              {{ getProgress() }}%
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Tabs -->
+      <ul class="nav nav-tabs border-0" id="workspaceTabs" role="tablist">
+
+        <li class="nav-item" role="presentation">
+
+          <button
+            class="nav-link border-0 fw-medium bg-transparent pb-3 px-4"
+            [class.active]="activeTab === 'tasks'"
+            [class.text-primary-accent]="activeTab === 'tasks'"
+            [class.border-bottom]="activeTab === 'tasks'"
+            [style.border-bottom-width.px]="activeTab === 'tasks' ? 3 : 0"
+            (click)="activeTab = 'tasks'">
+
+            Tasks
+
+          </button>
+
+        </li>
+
+        <li class="nav-item" role="presentation">
+
+          <button
+            class="nav-link border-0 fw-medium bg-transparent pb-3 px-4"
+            [class.active]="activeTab === 'team'"
+            [class.text-primary-accent]="activeTab === 'team'"
+            [class.border-bottom]="activeTab === 'team'"
+            [style.border-bottom-width.px]="activeTab === 'team' ? 3 : 0"
+            (click)="activeTab = 'team'">
+
+            Team
+
+          </button>
+
+        </li>
+
+      </ul>
+
+    </div>
+  </div>
+
+
+  <!-- Workspace Content -->
+  <div class="container py-4">
+
+    <!-- ================= TASKS TAB ================= -->
+    <div *ngIf="activeTab === 'tasks'">
+
+      <!-- 🔥 CHANGED: Task creation form -->
+      <div class="row mb-4 g-2">
+
+        <!-- Task title -->
+        <div class="col-md-5">
+
+          <input
+            type="text"
+            class="form-control shadow-sm border-0 py-2"
+            placeholder="Add a new task..."
+            [(ngModel)]="newTaskTitle"
+            (keyup.enter)="addTask()">
+
+        </div>
+
+
+        <!-- 🔥 CHANGED: Assignee dropdown -->
+        <div class="col-md-4">
+
+          <select
+            class="form-select shadow-sm border-0 py-2"
+            [(ngModel)]="selectedAssigneeId">
+
+            <option value="">
+              Assign to...
+            </option>
+
+            <option
+              *ngFor="let member of teamMembers"
+              [value]="member.freelancerId">
+
+              {{ member.name }}
+
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- 🔥 CHANGED: Add Task button -->
+        <div class="col-md-3">
+
+          <button
+            class="btn btn-primary w-100 py-2"
+            type="button"
+            (click)="addTask()">
+
+            <i class="bi bi-plus-lg me-1"></i>
+            Add Task
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= TASK COLUMNS ================= -->
+
+      <div class="row g-4">
+
+        <!-- To Do -->
+        <div class="col-md-4">
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h6 class="fw-bold text-muted mb-0">
+              TO DO
+            </h6>
+
+            <span class="badge bg-secondary rounded-pill">
+              {{ getTasksByStatus('To Do').length }}
+            </span>
+
+          </div>
+
+
+          <div
+            class="card border-0 shadow-sm mb-3"
+            *ngFor="let task of getTasksByStatus('To Do')">
+
+            <div class="card-body p-3">
+
+              <p class="fw-medium mb-2">
+                {{ task.title }}
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center">
+
+                <span class="badge bg-light text-dark border">
+
+                  <i class="bi bi-person me-1"></i>
+
+                  {{ task.assigneeName }}
+
+                </span>
+
+
+                <button
+                  class="btn btn-sm btn-light"
+                  (click)="updateTaskStatus(task, 'In Progress')"
+                  title="Start task">
+
+                  <i class="bi bi-play-fill text-primary"></i>
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- In Progress -->
+        <div class="col-md-4">
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h6 class="fw-bold text-primary mb-0">
+              IN PROGRESS
+            </h6>
+
+            <span class="badge bg-primary rounded-pill">
+              {{ getTasksByStatus('In Progress').length }}
+            </span>
+
+          </div>
+
+
+          <div
+            class="card border-0 shadow-sm mb-3 border-start border-primary border-4"
+            *ngFor="let task of getTasksByStatus('In Progress')">
+
+            <div class="card-body p-3">
+
+              <p class="fw-medium mb-2">
+                {{ task.title }}
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center">
+
+                <span class="badge bg-light text-dark border">
+
+                  <i class="bi bi-person me-1"></i>
+
+                  {{ task.assigneeName }}
+
+                </span>
+
+
+                <div>
+
+                  <button
+                    class="btn btn-sm btn-light me-1"
+                    (click)="updateTaskStatus(task, 'To Do')"
+                    title="Move to To Do">
+
+                    <i class="bi bi-arrow-left text-muted"></i>
+
+                  </button>
+
+
+                  <button
+                    class="btn btn-sm btn-light"
+                    (click)="updateTaskStatus(task, 'Completed')"
+                    title="Mark as Done">
+
+                    <i class="bi bi-check2 text-success"></i>
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Done -->
+        <div class="col-md-4">
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <h6 class="fw-bold text-success mb-0">
+              DONE
+            </h6>
+
+            <span class="badge bg-success rounded-pill">
+              {{ getTasksByStatus('Completed').length }}
+            </span>
+
+          </div>
+
+
+          <div
+            class="card border-0 shadow-sm mb-3 opacity-75"
+            *ngFor="let task of getTasksByStatus('Completed')">
+
+            <div class="card-body p-3">
+
+              <p class="text-decoration-line-through text-muted mb-2">
+                {{ task.title }}
+              </p>
+
+              <div class="d-flex justify-content-between align-items-center">
+
+                <span class="badge bg-light text-muted border">
+
+                  <i class="bi bi-person me-1"></i>
+
+                  {{ task.assigneeName }}
+
+                </span>
+
+
+                <button
+                  class="btn btn-sm btn-light"
+                  (click)="updateTaskStatus(task, 'In Progress')"
+                  title="Reopen task">
+
+                  <i class="bi bi-arrow-left text-muted"></i>
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= TEAM TAB ================= -->
+    <div *ngIf="activeTab === 'team'">
+
+      <div class="row g-4">
+
+        <div
+          class="col-md-6 col-lg-4"
+          *ngFor="let member of teamMembers">
+
+          <div class="card border-0 shadow-sm card-hover">
+
+            <div class="card-body p-4 text-center">
+
+              <div class="position-relative d-inline-block mb-3">
+
+                <div
+                  class="bg-light rounded-circle d-flex justify-content-center align-items-center text-primary-accent fs-3"
+                  style="width: 80px; height: 80px;">
+
+                  {{ member.name?.charAt(0) }}
+
+                </div>
+
+                <span
+                  class="position-absolute bottom-0 end-0 p-2 bg-success border border-white border-2 rounded-circle">
+                </span>
+
+              </div>
+
+
+              <h5 class="fw-bold mb-1">
+
+                <a
+                  [routerLink]="['/freelancer', member.freelancerId]"
+                  class="text-dark text-decoration-none">
+
+                  {{ member.name }}
+
+                </a>
+
+              </h5>
+
+
+              <p class="text-muted small mb-3">
+                {{ member.role }}
+              </p>
+
+
+              <button
+                class="btn btn-outline-primary btn-sm rounded-pill w-100">
+
+                <i class="bi bi-chat-dots me-1"></i>
+                Message
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

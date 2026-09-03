@@ -1,0 +1,80 @@
+<div class="bg-primary-accent text-white py-4">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold mb-2">My Projects</h2>
+      <p class="mb-0 opacity-75">Manage your active and completed projects.</p>
+    </div>
+    <div *ngIf="isClient">
+      <a routerLink="/projects/create" class="btn btn-light text-primary-accent fw-bold"><i class="bi bi-plus-lg me-1"></i> Post Project</a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-5">
+  
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary-accent" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && projects.length === 0" class="text-center py-5 bg-light rounded-lg">
+    <i class="bi bi-briefcase text-muted mb-3 d-block" style="font-size: 3rem;"></i>
+    <h4 class="fw-bold">No Projects Found</h4>
+    <p class="text-muted">You don't have any active or completed projects.</p>
+    <a *ngIf="!isClient" routerLink="/projects" class="btn btn-primary mt-2">Find Projects</a>
+    <a *ngIf="isClient" routerLink="/projects/create" class="btn btn-primary mt-2">Post a Project</a>
+  </div>
+
+  <div *ngIf="!loading && projects.length > 0">
+    <div class="row g-4">
+      
+      <div class="col-md-6 col-xl-4" *ngFor="let proj of projects">
+        <div class="card border-0 shadow-sm h-100 card-hover">
+          <div class="card-body p-4">
+            
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <span class="badge" 
+                    [ngClass]="{
+                      'bg-success': proj.status === 'open',
+                      'bg-primary': proj.status === 'in-progress',
+                      'bg-secondary': proj.status === 'completed'
+                    }">
+                {{ proj.status | titlecase }}
+              </span>
+              <h5 class="fw-bold text-primary-accent mb-0">${{ proj.budget }}</h5>
+            </div>
+            
+           <a [routerLink]="['/projects', proj.id]" class="text-dark text-decoration-none">
+  {{ proj.title }}
+</a>
+            
+            <p class="text-muted small mb-3">
+              <i class="bi bi-person me-1"></i> {{ isClient ? 'Client: You' : 'Client: ' + proj.clientName }}
+            </p>
+
+            <div class="mb-4" *ngIf="proj.status === 'in-progress'">
+              <div class="d-flex justify-content-between small mb-1">
+                <span class="text-muted">Progress</span>
+                <span class="fw-bold">{{ proj.progress }}%</span>
+              </div>
+              <div class="progress" style="height: 6px;">
+                <div class="progress-bar bg-primary-accent" role="progressbar" [style.width]="proj.progress + '%'"></div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-auto">
+              <span class="text-muted small"><i class="bi bi-clock me-1"></i> Due {{ proj.deadline | date:'MMM d' }}</span>
+             <a [routerLink]="['/projects', proj.id]" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+  Details
+</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

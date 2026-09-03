@@ -10,6 +10,7 @@ import com.freelancer.freelancer_platform.dto.ProjectResponse;
 import com.freelancer.freelancer_platform.entity.Project;
 import com.freelancer.freelancer_platform.entity.ProjectStatus;
 import com.freelancer.freelancer_platform.entity.User;
+import com.freelancer.freelancer_platform.exception.UnauthorizedActionException;
 import com.freelancer.freelancer_platform.repository.ProjectRepository;
 import com.freelancer.freelancer_platform.repository.UserRepository;
 
@@ -26,7 +27,7 @@ public class ProjectService {
         this.userRepository = userRepository;
     }
 
-    
+
     public ProjectResponse createProject(ProjectRequest request) {
 
     Authentication authentication =
@@ -45,6 +46,7 @@ public class ProjectService {
     project.setBudget(request.getBudget());
     project.setDeadline(request.getDeadline());
     project.setSkillsRequired(request.getSkillsRequired());
+    project.setCategory(request.getCategory());
     project.setStatus(ProjectStatus.OPEN);
 
     Project saved = projectRepository.save(project);
@@ -52,7 +54,7 @@ public class ProjectService {
     return convertToResponse(saved);
 }
 
-    
+
     public List<ProjectResponse> getAllProjects() {
 
         return projectRepository.findAll()
@@ -62,7 +64,7 @@ public class ProjectService {
     }
 
 
-    
+
     public ProjectResponse getProjectById(Long id) {
 
         Project project = projectRepository.findById(id)
@@ -72,32 +74,57 @@ public class ProjectService {
     }
 
 
-    
+
     public ProjectResponse updateProject(Long id, ProjectRequest request) {
 
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+    Project project = projectRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        project.setTitle(request.getTitle());
-        project.setDescription(request.getDescription());
-        project.setBudget(request.getBudget());
-        project.setDeadline(request.getDeadline());
-        project.setSkillsRequired(request.getSkillsRequired());
+    User user = getAuthenticatedUser();
 
-        Project updated = projectRepository.save(project);
-
-        return convertToResponse(updated);
+    if (!project.getClient().getId().equals(user.getId())) {
+        throw new UnauthorizedActionException(
+        "You are not allowed to update this project");
     }
+
+    project.setTitle(request.getTitle());
+    project.setDescription(request.getDescription());
+    project.setBudget(request.getBudget());
+    project.setDeadline(request.getDeadline());
+    project.setSkillsRequired(request.getSkillsRequired());
+    project.setCategory(request.getCategory());
+
+    Project updated = projectRepository.save(project);
+
+    return convertToResponse(updated);
+}
 
 
     public void deleteProject(Long id) {
 
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+    Project project = projectRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        projectRepository.delete(project);
+    User user = getAuthenticatedUser();
+
+    if (!project.getClient().getId().equals(user.getId())) {
+        throw new UnauthorizedActionException(
+        "You are not allowed to delete this project");
     }
 
+    projectRepository.delete(project);
+}
+
+    private User getAuthenticatedUser() {
+
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    return userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+}
 
     private ProjectResponse convertToResponse(Project project) {
 
@@ -113,6 +140,7 @@ public class ProjectService {
         response.setBudget(project.getBudget());
         response.setDeadline(project.getDeadline());
         response.setSkillsRequired(project.getSkillsRequired());
+        response.setCategory(project.getCategory());
         response.setStatus(project.getStatus());
 
         response.setCreatedAt(project.getCreatedAt());
@@ -122,43 +150,60 @@ public class ProjectService {
     }
 
     public List<ProjectResponse> searchProjects(
+        String keyword,
+        String category,
         String skill,
         Double minBudget,
         Double maxBudget,
         ProjectStatus status) {
 
-    List<Project> projects;
+    return projectRepository.findAll()
+            .stream()
 
-    if (skill != null && status != null) {
+            // Keyword → title OR description
+            .filter(project ->
+                    keyword == null ||
+                    project.getTitle().toLowerCase().contains(keyword.toLowerCase()) ||
+                    project.getDescription().toLowerCase().contains(keyword.toLowerCase())
+            )
 
-        projects = projectRepository
-                .findByStatusAndSkillsRequiredContainingIgnoreCase(status, skill);
+            // Category
+            .filter(project ->
+                    category == null ||
+                    (project.getCategory() != null &&
+                     project.getCategory().equalsIgnoreCase(category))
+            )
 
-    } else if (skill != null) {
+            // Skill
+            .filter(project ->
+                    skill == null ||
+                    (project.getSkillsRequired() != null &&
+                     project.getSkillsRequired()
+                            .toLowerCase()
+                            .contains(skill.toLowerCase()))
+            )
 
-        projects = projectRepository
-                .findBySkillsRequiredContainingIgnoreCase(skill);
+            // Minimum budget
+            .filter(project ->
+                    minBudget == null ||
+                    project.getBudget() >= minBudget
+            )
 
-    } else if (minBudget != null && maxBudget != null) {
+            // Maximum budget
+            .filter(project ->
+                    maxBudget == null ||
+                    project.getBudget() <= maxBudget
+            )
 
-        projects = projectRepository
-                .findByBudgetBetween(minBudget, maxBudget);
+            // Status
+            .filter(project ->
+                    status == null ||
+                    project.getStatus() == status
+            )
 
-    } else if (status != null) {
-
-        projects = projectRepository
-                .findByStatus(status);
-
-    } else {
-
-        projects = projectRepository.findAll();
-    }
-
-    return projects.stream()
             .map(this::convertToResponse)
             .toList();
-    }
-
+}
     public List<ProjectResponse> getProjectsByClient(Long clientId) {
 
     return projectRepository.findByClientId(clientId)

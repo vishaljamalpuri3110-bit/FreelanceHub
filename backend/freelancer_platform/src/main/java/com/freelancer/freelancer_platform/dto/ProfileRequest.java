@@ -4,26 +4,33 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
 public class ProfileRequest {
-    
+
     private Long userId;
-    
+
     @NotBlank
     private String location;
-    
+
     private String skills;
-    
+
     @Positive
     private Double hourlyRate;
-    
+
     private String experienceLevel;
-    
+
     private String bio;
-    
+
     private String companyName;
-    
+
     private String industry;
-    
+
     private String companyDescription;
+
+    private String profilePhoto;
+private String education;
+private String portfolio;
+private String availability;
+private String previousProjects;
+private String contactInformation;
 
     public Long getUserId() {
         return userId;
@@ -100,5 +107,54 @@ public class ProfileRequest {
     public ProfileRequest() {
     }
 
-    
+    public String getProfilePhoto() {
+        return profilePhoto;
+    }
+
+    public void setProfilePhoto(String profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public String getPortfolio() {
+        return portfolio;
+    }
+
+    public void setPortfolio(String portfolio) {
+        this.portfolio = portfolio;
+    }
+
+    public String getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(String availability) {
+        this.availability = availability;
+    }
+
+    public String getPreviousProjects() {
+        return previousProjects;
+    }
+
+    public void setPreviousProjects(String previousProjects) {
+        this.previousProjects = previousProjects;
+    }
+
+    public String getContactInformation() {
+        return contactInformation;
+    }
+
+    public void setContactInformation(String contactInformation) {
+        this.contactInformation = contactInformation;
+    }
+
+
+
 }

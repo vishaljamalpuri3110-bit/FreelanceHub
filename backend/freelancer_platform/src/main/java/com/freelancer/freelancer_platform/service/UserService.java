@@ -7,10 +7,12 @@ import com.freelancer.freelancer_platform.dto.UserResponse;
 import com.freelancer.freelancer_platform.entity.User;
 import com.freelancer.freelancer_platform.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class UserService {
-    
+
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -46,5 +48,16 @@ public class UserService {
         return response;
     }
 
+    public UserResponse getCurrentUser() {
 
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+
+    String email = authentication.getName();
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return convertToResponse(user);
+}
 }

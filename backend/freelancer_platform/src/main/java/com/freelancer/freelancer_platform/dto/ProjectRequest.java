@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 public class ProjectRequest {
-    
+
     @NotBlank
     private String title;
 
@@ -26,7 +26,18 @@ public class ProjectRequest {
     @NotBlank
     private String skillsRequired;
 
+    private String category;
+
     private Long clientId;
+
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public String getTitle() {
         return title;
@@ -79,6 +90,6 @@ public class ProjectRequest {
     public ProjectRequest() {
     }
 
-    
+
 
 }

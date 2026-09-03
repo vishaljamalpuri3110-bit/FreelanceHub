@@ -18,9 +18,11 @@ public class ProjectResponse {
     private LocalDate deadline;
     private String skillsRequired;
     private ProjectStatus status;
-
+    private String category;
     private Instant createdAt;
     private Instant updatedAt;
+
+
     public Long getId() {
         return id;
     }
@@ -89,7 +91,13 @@ public class ProjectResponse {
     }
     public ProjectResponse() {
     }
+    public String getCategory() {
+        return category;
+    }
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-    
-    
+
+
 }

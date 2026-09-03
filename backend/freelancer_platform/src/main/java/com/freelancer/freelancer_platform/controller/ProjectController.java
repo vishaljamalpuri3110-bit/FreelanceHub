@@ -47,19 +47,23 @@ public class ProjectController {
 
     @GetMapping("/search")
 public List<ProjectResponse> searchProjects(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) String category,
         @RequestParam(required = false) String skill,
         @RequestParam(required = false) Double minBudget,
         @RequestParam(required = false) Double maxBudget,
         @RequestParam(required = false) ProjectStatus status) {
 
     return projectService.searchProjects(
+            keyword,
+            category,
             skill,
             minBudget,
             maxBudget,
             status
     );
 }
-    
+
     @GetMapping("/{id}")
     public ProjectResponse getProjectById(
             @PathVariable Long id) {
@@ -90,6 +94,6 @@ public List<ProjectResponse> searchProjects(
     public List<ProjectResponse> getProjectsByClient(
         @PathVariable Long clientId) {
             return projectService.getProjectsByClient(clientId);
-        
+
     }
 }

@@ -9,6 +9,7 @@ import com.freelancer.freelancer_platform.service.UserService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -27,5 +28,10 @@ public class UserController {
     public UserResponse createUser(@Valid @RequestBody UserRequest request) {
         return userService.saveUser(request);
     }
-    
+
+    @GetMapping("/me")
+public UserResponse getCurrentUser() {
+    return userService.getCurrentUser();
+}
+
 }

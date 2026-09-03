@@ -18,4 +18,11 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     List<Project> findByStatusAndSkillsRequiredContainingIgnoreCase(ProjectStatus projectStatus,String skill);
 
     List<Project> findByClientId(Long clientId);
+
+    List<Project> findByCategoryIgnoreCase(String category);
+
+List<Project> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+        String title,
+        String description
+);
 }

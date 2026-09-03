@@ -8,6 +8,9 @@ import com.freelancer.freelancer_platform.entity.Profile;
 import com.freelancer.freelancer_platform.entity.User;
 import com.freelancer.freelancer_platform.repository.ProfileRepository;
 import com.freelancer.freelancer_platform.repository.UserRepository;
+import java.util.List;
+
+import com.freelancer.freelancer_platform.entity.UserRole;
 
 @Service
 public class ProfileService {
@@ -30,7 +33,7 @@ public class ProfileService {
     public ProfileResponse createProfile(ProfileRequest request) {
         User user = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
-            
+
         Profile profile = new Profile();
         profile.setUser(user);
         profile.setLocation(request.getLocation());
@@ -41,7 +44,13 @@ public class ProfileService {
         profile.setCompanyName(request.getCompanyName());
         profile.setIndustry(request.getIndustry());
         profile.setCompanyDescription(request.getCompanyDescription());
-        
+        profile.setProfilePhoto(request.getProfilePhoto());
+profile.setEducation(request.getEducation());
+profile.setPortfolio(request.getPortfolio());
+profile.setAvailability(request.getAvailability());
+profile.setPreviousProjects(request.getPreviousProjects());
+profile.setContactInformation(request.getContactInformation());
+
         Profile saved = profileRepository.save(profile);
         return convertToResponse(saved);
     }
@@ -90,6 +99,13 @@ public class ProfileService {
     profile.setIndustry(request.getIndustry());
     profile.setCompanyDescription(request.getCompanyDescription());
 
+    profile.setProfilePhoto(request.getProfilePhoto());
+profile.setEducation(request.getEducation());
+profile.setPortfolio(request.getPortfolio());
+profile.setAvailability(request.getAvailability());
+profile.setPreviousProjects(request.getPreviousProjects());
+profile.setContactInformation(request.getContactInformation());
+
     Profile updated = profileRepository.save(profile);
 
     return convertToResponse(updated);
@@ -101,5 +117,65 @@ public class ProfileService {
             .orElseThrow(() -> new RuntimeException("Profile not found"));
 
     profileRepository.delete(profile);
+}
+
+public List<ProfileResponse> searchFreelancers(
+        String keyword,
+        String skill,
+        String location,
+        String experienceLevel) {
+
+    return profileRepository.findAll()
+            .stream()
+
+            // Only freelancers
+            .filter(profile ->
+                    profile.getUser().getRole() == UserRole.FREELANCER
+            )
+
+            // Keyword → name OR bio OR skills
+            .filter(profile ->
+                    keyword == null ||
+                    profile.getUser().getName()
+                            .toLowerCase()
+                            .contains(keyword.toLowerCase()) ||
+                    (profile.getBio() != null &&
+                     profile.getBio()
+                            .toLowerCase()
+                            .contains(keyword.toLowerCase())) ||
+                    (profile.getSkills() != null &&
+                     profile.getSkills()
+                            .toLowerCase()
+                            .contains(keyword.toLowerCase()))
+            )
+
+            // Skill
+            .filter(profile ->
+                    skill == null ||
+                    (profile.getSkills() != null &&
+                     profile.getSkills()
+                            .toLowerCase()
+                            .contains(skill.toLowerCase()))
+            )
+
+            // Location
+            .filter(profile ->
+                    location == null ||
+                    (profile.getLocation() != null &&
+                     profile.getLocation()
+                            .toLowerCase()
+                            .contains(location.toLowerCase()))
+            )
+
+            // Experience level
+            .filter(profile ->
+                    experienceLevel == null ||
+                    (profile.getExperienceLevel() != null &&
+                     profile.getExperienceLevel()
+                            .equalsIgnoreCase(experienceLevel))
+            )
+
+            .map(this::convertToResponse)
+            .toList();
 }
 }

@@ -71,8 +71,10 @@ if (alreadyApplied) {
 
 application.setProject(project);
 application.setFreelancer(freelancer);
-application.setCoverLetter(request.getCoverLetter());
-application.setProposedBudget(request.getProposedBudget());
+application.setCoverLetter(
+    "I am interested in working on this project and believe my skills are a good match."
+);
+application.setProposedBudget(request.getBudget());
 application.setStatus(ApplicationStatus.PENDING);
 
         Application saved = applicationRepository.save(application);

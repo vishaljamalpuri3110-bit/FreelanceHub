@@ -18,7 +18,7 @@ import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Project {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,6 +38,7 @@ public class Project {
 
     private String skillsRequired;
 
+    private String category;
 
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
@@ -130,9 +131,18 @@ public class Project {
         this.updatedAt = updatedAt;
     }
 
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public Project() {
     }
 
-    
+
 
 }

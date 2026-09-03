@@ -1,19 +1,33 @@
-# Java / Spring Boot
-backend/**/target/
-*.class
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Node / Angular
-frontend/**/node_modules/
-frontend/**/.angular/
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
-# Environment / secrets
-.env
-*.env
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
 
-# IDE
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
 .vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db

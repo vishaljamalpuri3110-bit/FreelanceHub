@@ -71,14 +71,13 @@ A full-stack freelancer collaboration platform built with **Spring Boot** and **
 ## 📁 Project Structure
 
 ```text
-Freelancer-Collaboration-Platform/
-│
-├── backend/
-│   ├── freelancer_platform/
+FreelanceHub/
+|
+│── ├── backend/
 │   │   ├── src/
 │   │   └── pom.xml
 │   │
-│   ├── frontend/
+│── ├── frontend/
 │   │   ├── src/
 │   │   ├── public/
 │   │   ├── angular.json
@@ -128,7 +127,7 @@ spring.datasource.password=YOUR_PASSWORD
 Open a terminal in:
 
 ```text
-backend/freelancer_platform
+FreelanceHub/backend
 ```
 
 Run:
@@ -264,10 +263,3 @@ Planned improvements include:
 * Production environment configuration
 * CI/CD pipeline
 
-## 👥 Team
-
-This project is developed as a collaborative full-stack application using Angular and Spring Boot.
-
-## 📄 License
-
-This project is intended for educational and academic purposes.

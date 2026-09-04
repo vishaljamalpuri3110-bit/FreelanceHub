@@ -147,7 +147,7 @@ http://localhost:8080
 Open another terminal in:
 
 ```text
-backend/frontend
+FreelanceHUb/frontend
 ```
 
 Install dependencies:
